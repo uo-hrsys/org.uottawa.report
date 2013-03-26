@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="net.sourceforge.dita4publishers.html5.somereports">
+
+	<require plugin="net.sourceforge.dita4publishers.html5" />
+	
+	<template file="build_uohtml5-transtype-html5-report_template.xml" />
+	<template file="xsl/map2somereports_template.xsl" />
+		
+	<feature extension="dita.conductor.transtype.check" value="somereports" type="txt" />
+	<feature extension="dita.conductor.target.relative" file="build.xml" type="file" />
+	<feature extension="dita.html5.map" value="parameters.xml" type="file" />
+</plugin>

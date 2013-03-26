@@ -1,0 +1,3 @@
+<project>
+	<import file="build_uohtml5-transtype-html5-report.xml" />
+</project>

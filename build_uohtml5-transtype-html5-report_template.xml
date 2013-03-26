@@ -1,0 +1,28 @@
+<project name="dita2somereports" default="dita2somereports" xmlns:dita="http://dita-ot.sourceforge.net">
+
+	<property name="transtype" value="somereports"/>
+
+	<dirname property="somereports.dir" file="${ant.file.dita2somereports}"/>
+		
+   <target name="dita2somereports" depends="build-init, preprocess, dita2audiencereport"/>
+
+	<target name="dita2audiencereport" 
+		xmlns:dita="http://dita-ot.sourceforge.net"
+		dita:extension="depends org.dita.dost.platform.InsertDependsAction">
+
+		 <xslt processor="trax"
+      		basedir="${dita.temp.dir}"
+      		destdir="${output.dir}"
+     		includesfile="${dita.temp.dir}${file.separator}${user.input.file.listfile}"
+      		classpathref="dost.class.path"
+      		style="${somereports.dir}/xsl/map2somereports.xsl"
+      		filenameparameter="inputFileNameParam"
+    	 >
+              <param name="outdir" expression="${output.dir}"/>
+        </xslt>
+		
+
+
+	</target>
+
+</project>

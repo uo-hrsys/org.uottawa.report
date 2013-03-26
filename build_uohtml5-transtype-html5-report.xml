@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><project name="dita2somereports" default="dita2somereports">
+
+	<property name="transtype" value="somereports"></property>
+
+	<dirname property="somereports.dir" file="${ant.file.dita2somereports}"></dirname>
+		
+   <target name="dita2somereports" depends="build-init, preprocess, dita2audiencereport"></target>
+
+	<target name="dita2audiencereport">
+
+		 <xslt processor="trax" basedir="${dita.temp.dir}" destdir="${output.dir}" includesfile="${dita.temp.dir}${file.separator}${user.input.file.listfile}" classpathref="dost.class.path" style="${somereports.dir}/xsl/map2somereports.xsl" filenameparameter="inputFileNameParam">
+              <param name="outdir" expression="${output.dir}"></param>
+        </xslt>
+		
+
+
+	</target>
+
+</project>
