@@ -42,7 +42,7 @@ Installation
 Install the following project on your computer.
 
 * DITA-OT http://dita-ot.sourceforge.net/
-* DITA for publishers set of plugins and vocabulary extentions http://dita4publishers.sourceforge.net/
+
 
 
 License
