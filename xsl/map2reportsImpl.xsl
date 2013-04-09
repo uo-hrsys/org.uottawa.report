@@ -1,5 +1,5 @@
 <xsl:stylesheet xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="xs xsl" version="2.0">
+  exclude-result-prefixes="xs xsl ditaarch" version="2.0">
 
   <xsl:param name="outdir" select="''"/>
 
@@ -37,8 +37,11 @@
 
   <xsl:template match="*[contains(@class, 'map/map')]" mode="generate-report-map">
     <xsl:result-document format="dita-ditamap" href="main.ditamap">
-      <map xml:lang="en-ca">
+      <map xml:lang="{@xml:lang}">
         <title>Documentation Report</title>
+        <topicmeta>
+        	<xsl:sequence select="topicmeta/*" />
+        </topicmeta>
         <topicref href="audience-report.xml" type="concept"/>
       </map>
 
@@ -56,7 +59,7 @@
       <concept id="concept_v1g_vb4_pj">
         <title>Audience applicability report</title>
         <conbody>
-          <table frame="all" id="table_audiences"  outputclass="table-fixed-header">
+          <table frame="all" id="table_audiences" outputclass="table-fixed-header">
             <title>Audiences Information</title>
             <tgroup cols="{$countOfAudience}">
               <xsl:for-each select="$audiences/audiences/audience">
@@ -140,7 +143,7 @@
       </entry>
       <xsl:for-each select="$audiences/audiences/audience">
         <entry>
-          
+
           <xsl:choose>
             <xsl:when test="$audience='' or contains($audience, @name)">
               <ph outputclass="ui-icon ui-icon-check">
