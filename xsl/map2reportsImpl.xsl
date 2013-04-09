@@ -40,7 +40,7 @@
       <map xml:lang="{@xml:lang}">
         <title>Documentation Report</title>
         <topicmeta>
-        	<xsl:sequence select="topicmeta/*" />
+          <xsl:sequence select="topicmeta/*"/>
         </topicmeta>
         <topicref href="audience-report.xml" type="concept"/>
       </map>
@@ -132,7 +132,15 @@
         <xsl:choose>
           <xsl:when test="$level=0">
             <b>
-              <xsl:value-of select="./topicmeta/navtitle"/>
+              <xsl:choose>
+                <xsl:when test="./topicmeta/navtitle">
+                  <xsl:value-of select="./topicmeta/navtitle"/>
+                </xsl:when>
+                <xsl:when test="./topicmeta/linktext">
+                  <xsl:value-of select="./topicmeta/linktext"/>
+                </xsl:when>
+                <xsl:otherwise> <xsl:value-of select="'-'"/> </xsl:otherwise>
+                </xsl:choose>
             </b>
           </xsl:when>
           <xsl:otherwise>
