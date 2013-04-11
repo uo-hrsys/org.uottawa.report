@@ -1,10 +1,13 @@
 <xsl:stylesheet xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="xs xsl ditaarch" version="2.0">
+  xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" exclude-result-prefixes="xs xsl ditaarch" version="2.0">
 
   <xsl:param name="outdir" select="''"/>
 
   <xsl:output name="dita-concept" method="xml" doctype-public="-//OASIS//DTD DITA Concept//EN"
     doctype-system="technicalContent/dtd/concept.dtd"/>
+
+  <xsl:output name="dita-reference" method="xml" doctype-public="-//OASIS//DTD DITA Reference//EN"
+    doctype-system="technicalContent/dtd/reference.dtd"/>
 
   <xsl:output name="dita-ditamap" method="xml" doctype-public="-//OASIS//DTD DITA Map//EN"
     doctype-system="technicalContent/dtd/map.dtd"/>
@@ -17,7 +20,11 @@
       </audiences>
     </xsl:variable>
 
-    <xsl:apply-templates select="." mode="generate-content">
+    <xsl:apply-templates select="." mode="generate-audience-applicability-content">
+      <xsl:with-param name="audiences" select="$audiences" tunnel="yes"/>
+    </xsl:apply-templates>
+
+    <xsl:apply-templates select="." mode="generate-keydef-report-content">
       <xsl:with-param name="audiences" select="$audiences" tunnel="yes"/>
     </xsl:apply-templates>
 
@@ -40,20 +47,54 @@
       <map xml:lang="{@xml:lang}">
         <title>Documentation Report</title>
         <topicmeta>
-          <xsl:sequence select="topicmeta/*"/>
+          <xsl:apply-templates select="topicmeta/*" mode="copy-meta"/>
         </topicmeta>
-        <topicref href="audience-report.xml" type="concept"/>
+        
+        <topicref href="audience-report.dita" type="concept"/>
+        
+        <topichead>
+          <topicmeta>
+            <navtitle>Key definitions</navtitle>
+          </topicmeta>
+          
+          <xsl:for-each select="keydef">
+            <xsl:variable name="countOfkeydef" select="count(preceding-sibling::keydef)"/>
+            <xsl:variable name="resultUri" select="concat('references/keydef-', $countOfkeydef, '.dita')"/>
+            <topicref href="{$resultUri}" type="reference"/>
+          </xsl:for-each>
+          
+          
+        </topichead>
       </map>
 
     </xsl:result-document>
   </xsl:template>
 
-  <xsl:template match="*[contains(@class, 'map/map')]" mode="generate-content">
+
+  <xsl:template match="@*" mode="copy-meta">
+    <xsl:if test="local-name() != 'xtrc' and local-name() != 'xtrf' and local-name() !='class'">
+      <xsl:message>
+        <xsl:value-of select="local-name()"/>
+      </xsl:message>
+      <xsl:attribute name="{local-name()}">
+        <xsl:value-of select="."/>
+      </xsl:attribute>
+    </xsl:if>
+    <!--xsl:apply-templates/-->
+  </xsl:template>
+
+  <xsl:template match="*" mode="copy-meta">
+    <xsl:element name="{local-name()}">
+      <xsl:apply-templates select="@* | node()" mode="copy-meta"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="*[contains(@class, 'map/map')]" mode="generate-audience-applicability-content">
 
     <xsl:param name="audiences" tunnel="yes"/>
 
     <xsl:variable name="countOfAudience" select="count($audiences/*)"/>
-    <xsl:variable name="resultUri" select="'audience-report.xml'"/>
+    <xsl:variable name="resultUri" select="'audience-report.dita'"/>
 
     <xsl:result-document format="dita-concept" href="{$resultUri}">
       <concept id="concept_v1g_vb4_pj">
@@ -139,8 +180,10 @@
                 <xsl:when test="./topicmeta/linktext">
                   <xsl:value-of select="./topicmeta/linktext"/>
                 </xsl:when>
-                <xsl:otherwise> <xsl:value-of select="'-'"/> </xsl:otherwise>
-                </xsl:choose>
+                <xsl:otherwise>
+                  <xsl:value-of select="'-'"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </b>
           </xsl:when>
           <xsl:otherwise>
@@ -169,6 +212,55 @@
         </entry>
       </xsl:for-each>
     </row>
+  </xsl:template>
+
+
+  <!-- keydef -->
+  <xsl:template match="*" mode="generate-keydef-report-content"/>
+
+  <xsl:template match="*[contains(@class, 'map/map')]" mode="generate-keydef-report-content">
+    <xsl:apply-templates select="*" mode="#current"/>
+  </xsl:template>
+
+  <xsl:template match="keydef" mode="generate-keydef-report-content">
+
+    <xsl:variable name="countOfkeydef" select="count(preceding-sibling::keydef)"/>
+    <xsl:variable name="resultUri" select="concat('references/keydef-', $countOfkeydef, '.dita')"/>
+
+    <xsl:result-document format="dita-reference" href="{$resultUri}">
+      <reference id="{concat('keydef-', $countOfkeydef)}">
+        <title>
+          <xsl:value-of select="@keys"/>
+        </title>
+        <prolog>
+          <metadata>
+            <keywords>
+              <indexterm><xsl:value-of select="@keys"/> (key)</indexterm>
+              <indexterm>
+                <xsl:value-of select="@href"/>
+              </indexterm>
+            </keywords>
+          </metadata>
+        </prolog>
+        <refbody>
+          <properties>
+            <prophead>
+              <proptypehd>Attribute Name</proptypehd>
+              <propvaluehd>Value</propvaluehd>
+            </prophead>
+            <xsl:for-each select="@*">
+              <property>
+                <proptype>@<xsl:value-of select="name(.)"/></proptype>
+                <propvalue>
+                  <xsl:value-of select="."/>
+                </propvalue>
+              </property>
+            </xsl:for-each>
+          </properties>
+        </refbody>
+      </reference>
+    </xsl:result-document>
+
   </xsl:template>
 
 
